@@ -19,7 +19,7 @@ type Card struct {
     CreatedAt string `json:"created_at"`
 }
 
-func CreateCardHandler(w http.ResponseWriter, r *http.Request) {
+func CreateCard(w http.ResponseWriter, r *http.Request) {
     var card Card
     decoder := json.NewDecoder(r.Body)
     if err := decoder.Decode(&card); err != nil {
@@ -56,7 +56,7 @@ func CreateCardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func GetCardsByDeckHandler(w http.ResponseWriter, r *http.Request) {
+func GetCardsByDeck(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     deckID := params["deck_id"]
 
@@ -91,7 +91,7 @@ func GetCardsByDeckHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(cards)
 }
 
-func UpdateCardHandler(w http.ResponseWriter, r *http.Request) {
+func UpdateCard(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     cardID, err := strconv.Atoi(params["card_id"])
     if err != nil {
@@ -129,7 +129,7 @@ func UpdateCardHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func DeleteCardHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteCard(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     cardID, err := strconv.Atoi(params["card_id"])
     if err != nil {

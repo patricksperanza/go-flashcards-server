@@ -60,6 +60,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	_, err = db.DB.Exec("INSERT INTO user (first_name, last_name, email, password_hash, salt) VALUES (?, ?, ?, ?, ?)",
 		user.FirstName, user.LastName, user.Email, hashedPassword, salt)
 	if err != nil {
+		log.Printf("Error creating user: %v\n", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
@@ -109,65 +110,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 
     json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
-}
-
-func CreateDeckHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := getUserIdFromContext(r)
-	if err != nil {
-		fmt.Printf("%v", err.Error())
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	var payload struct {
-		Name string `json:"name"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
-
-	if payload.Name == "" {
-		http.Error(w, "Deck name is required", http.StatusBadRequest)
-		return
-	}
-
-	deckID, err := db.CreateDeck(userID, payload.Name)
-	if err != nil {
-		http.Error(w, "Failed to create deck", http.StatusInternalServerError)
-		return
-	}
-
-	response := map[string]interface{}{
-		"message": "Deck created successfully",
-		"deck_id": deckID,
-	}
-	json.NewEncoder(w).Encode(response)
-}
-
-func GetDecksHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := getUserIdFromContext(r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	decks, err := db.GetDecksByUser(userID)
-	if err != nil {
-		http.Error(w, "Failed to retrieve decks", http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(decks)
-}
-
-func getUserIdFromContext(r *http.Request) (int, error) {
-	ctx := r.Context()
-	userID, ok := ctx.Value("userID").(int)
-	if !ok {
-		return 0, http.ErrNoCookie
-	}
-	return userID, nil
 }
 
 

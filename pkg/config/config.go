@@ -30,7 +30,7 @@ func Init() {
 	DBPassword= os.Getenv("DB_PASSWORD")
 	DBHost = os.Getenv("DB_HOST")
 	DBPort = os.Getenv("DB_PORT")
-	if DBUsername == "" || DBPassword == "" || DBHost == "" || DBPort == "" {
+	if DBUsername == "" || DBPassword == "" || DBHost == "" || DBPort == ""  || DBName == "" {
         log.Fatal("Missing one or more required environment variables")
     }
 }
