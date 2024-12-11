@@ -62,3 +62,35 @@ func GetDecksByUser(userID int) ([]Deck, error) {
 	}
 	return decks, nil
 }
+
+func UpdateCard(cardID int, question, answer string) (int64, error) {
+	query := "UPDATE card SET question = ?, answer = ? WHERE id = ?"
+	result, err := DB.Exec(query, question, answer, cardID)
+	if err != nil {
+		log.Printf("Error update card with ID %d: %v\n", cardID, err)
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error retrieving rows affected: %v", err)
+		return 0, err
+	}
+	return rowsAffected, nil
+}
+
+func DeleteCard(cardID int) (int64, error) {
+	query := "DELETE FROM card WHERE id = ?"
+	result, err := DB.Exec(query, cardID)
+	if err != nil {
+		log.Printf("Error deleting card with id %d: %v\n", cardID, err)
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error retrieving rows: %v", err)
+		return 0, err
+	}
+	return rowsAffected, nil
+}

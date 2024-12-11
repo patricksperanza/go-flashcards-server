@@ -28,6 +28,8 @@ func main() {
     cardRouter.Use(middleware.AuthMiddleware)
     cardRouter.HandleFunc("/create", handler.CreateCardHandler).Methods("POST")
     cardRouter.HandleFunc("/{deck_id}", handler.GetCardsByDeckHandler).Methods("GET")
+    cardRouter.HandleFunc("/update/{card_id}", handler.UpdateCardHandler).Methods("PUT")
+    cardRouter.HandleFunc("/delete/{card_id}", handler.DeleteCardHandler).Methods("DELETE")
     
     log.Println("Server started on :8000")
     log.Fatal(http.ListenAndServe(":8000", r))
