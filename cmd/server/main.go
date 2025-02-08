@@ -16,13 +16,15 @@ func main() {
     db.Init()
 
     r := mux.NewRouter()
-    r.HandleFunc("/signup", handler.SignUp).Methods("POST")
-    r.HandleFunc("/login", handler.Login).Methods("POST")
+    r.Use(middleware.CorsMiddleware)
+    r.Use(middleware.LoggingMiddleware)
+    r.HandleFunc("/signup", handler.SignUp).Methods("POST", "OPTIONS")
+    r.HandleFunc("/login", handler.Login).Methods("POST", "OPTIONS")
 
     deckRouter := r.PathPrefix("/deck").Subrouter()
     deckRouter.Use(middleware.AuthMiddleware)
     deckRouter.HandleFunc("/create", handler.CreateDeck).Methods("POST")
-    deckRouter.HandleFunc("", handler.GetDecks).Methods("GET")
+    deckRouter.HandleFunc("", handler.GetDecks).Methods("GET", "OPTIONS")
     deckRouter.HandleFunc("/update/{deck_id}", handler.UpdateDeck).Methods("PUT")
     deckRouter.HandleFunc("/delete/{deck_id}", handler.DeleteDeck).Methods("DELETE")
 

@@ -3,31 +3,32 @@ package middleware
 import (
 	"context"
 	"go-flashcards-server/pkg/config"
+	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 
 func AuthMiddleware(next http.Handler) http.Handler {
+	log.Println("AuthMiddleware()")
 	jwtKey := config.JWTSecretKey
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, "Authorization header missing", http.StatusUnauthorized)
+		log.Println("cookies: ", r.Cookies())
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				http.Error(w, "JWT cookie missing", http.StatusUnauthorized)
+				return
+			}
+			http.Error(w, "Error reading cookie", http.StatusBadRequest)
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			http.Error(w, "Malformed token", http.StatusUnauthorized)
-			return
-		}
-
+		tokenString := cookie.Value
 		claims := &jwt.MapClaims{}
-		_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
 		})
 		if err != nil {

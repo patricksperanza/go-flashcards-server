@@ -31,7 +31,6 @@ type Credentials struct {
 }
 
 func generateSalt() string {
-	rand.Seed(time.Now().UnixNano())
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var salt []byte
 	for i := 0; i < 16; i++ {
@@ -109,9 +108,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",             
+		Value:    tokenString,         
+		Expires:  expirationTime,      
+		HttpOnly: false,              
+		SameSite: http.SameSiteNoneMode, 
+		Path:     "/",        
+		Secure:   false,
+	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
 }
-
-
-
-

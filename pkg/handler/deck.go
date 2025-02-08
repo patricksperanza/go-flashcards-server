@@ -14,7 +14,7 @@ import (
 func CreateDeck(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserIdFromContext(r)
 	if err != nil {
-		fmt.Printf("%v", err.Error())
+		fmt.Printf("Error getting user: %v\n", err.Error())
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -46,8 +46,10 @@ func CreateDeck(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetDecks(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetDecks()")
 	userID, err := getUserIdFromContext(r)
 	if err != nil {
+		log.Println("Error getting user: ", err.Error())
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -122,7 +124,6 @@ func DeleteDeck(w http.ResponseWriter, r *http.Request) {
     response := map[string]string{"message": "Deck deleted successfully"}
     w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(response)
-
 }
 
 func getUserIdFromContext(r *http.Request) (int, error) {
