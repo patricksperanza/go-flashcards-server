@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"go-flashcards-server/pkg/config"
+	"go-flashcards-server/pkg/types"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -11,25 +12,18 @@ import (
 
 var DB *sql.DB
 
-type Deck struct {
-	ID        int    `json:"id"`
-	UserID    int    `json:"user_id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-}
-
 func Init() {
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUsername, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
 	var err error
-    DB, err = sql.Open("mysql", dataSourceName)
-    if err != nil {
-        log.Fatalf("Error connecting to database: %v", err)
-    }
-    err = DB.Ping()
-    if err != nil {
-        log.Fatalf("Error pinging database: %v", err)
-    }
-    fmt.Println("Database connected")
+	DB, err = sql.Open("mysql", dataSourceName)
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
+	}
+	err = DB.Ping()
+	if err != nil {
+		log.Fatalf("Error pinging database: %v", err)
+	}
+	fmt.Println("Database connected")
 }
 
 func CreateDeck(userID int, name string) (int64, error) {
@@ -42,7 +36,7 @@ func CreateDeck(userID int, name string) (int64, error) {
 	return result.LastInsertId()
 }
 
-func GetDecksByUser(userID int) ([]Deck, error) {
+func GetDecksByUser(userID int) ([]types.Deck, error) {
 	query := "SELECT id, user_id, name, created_at FROM deck WHERE user_id = ?"
 	rows, err := DB.Query(query, userID)
 	if err != nil {
@@ -51,9 +45,9 @@ func GetDecksByUser(userID int) ([]Deck, error) {
 	}
 	defer rows.Close()
 
-	var decks []Deck
+	var decks []types.Deck
 	for rows.Next() {
-		var deck Deck
+		var deck types.Deck
 		if err := rows.Scan(&deck.ID, &deck.UserID, &deck.Name, &deck.CreatedAt); err != nil {
 			log.Printf("Error scanning deck row: %v", err)
 			return nil, err
