@@ -154,7 +154,7 @@ func loginUser(creds *Credentials, w http.ResponseWriter) (*UserPayload, error) 
 		HttpOnly: false,
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
-		Secure:   true,
+		Secure:   false,
 	})
 	userPayload := UserPayload{
 		ID:        user.ID,
